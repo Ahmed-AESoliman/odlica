@@ -1,16 +1,23 @@
+# E-Commerce Database Schema
+
+This repository contains the **Entity-Relationship Diagram (ERD)** for an e-commerce platform, designed using **Mermaid.js**.
+
+## ER Diagram
+
+```mermaid
 erDiagram
-CATEGORIES {
-id int PK
-name string
-slug string
-description text
-image string
-parent_id int FK
-position int
-active boolean
-created_at timestamp
-updated_at timestamp
-}
+    CATEGORIES {
+        id int PK
+        name string
+        slug string
+        description text
+        image string
+        parent_id int FK
+        position int
+        active boolean
+        created_at timestamp
+        updated_at timestamp
+    }
 
     PRODUCTS {
         id int PK
@@ -140,3 +147,4 @@ updated_at timestamp
     SIZES ||--o{ VARIANT_SIZE : "used_in"
     PRODUCTS ||--o{ CART_ITEMS : "added_to"
     PRODUCT_VARIANTS ||--o{ CART_ITEMS : "added_to"
+```
