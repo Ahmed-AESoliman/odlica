@@ -17,11 +17,11 @@
 
 </head>
 
-<body class="antialiased dark:bg-gray-900 text-gray-900 dark:text-white
+<body class="antialiased dark:bg-gray-800 text-gray-900 dark:text-white
 min-h-dvh">
     <livewire:layout.header />
     <livewire:layout.cart />
-    <flux:main class="grid auto-cols-max grid-flow-col max-h-screen overflow-hidden gap-2">
+    <flux:main class="flex max-h-screen  gap-2">
         <livewire:layout.filter />
         {{ $slot }}
     </flux:main>

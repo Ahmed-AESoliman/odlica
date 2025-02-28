@@ -3,7 +3,7 @@
         <flux:brand href="#" logo="{{ asset('blue-logo.svg') }}" class="dark:hidden h-auto! w-[10rem]" />
         <flux:brand href="#" logo="{{ asset('white-logo.svg') }}" class="hidden dark:flex h-auto! w-[10rem]" />
         <flux:navbar class="mr-4 ml-auto">
-            <flux:navbar.item icon="shopping-bag" badge="12" badge-color="red"
+            <flux:navbar.item icon="shopping-bag" badge="12" badge-color="red" class="cursor-pointer"
                 x-on:click="$flux.modal('cart').show()">
             </flux:navbar.item>
             <flux:separator vertical />
