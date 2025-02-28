@@ -22,8 +22,7 @@ yarn-error.log
 /.vscode
 /.zed
 
-# Allow storage/app/public but ignore other storage files
-/storage/*
-!/storage/app/
-!/storage/app/public/
-!/storage/app/public/*
+/storage/app/public/*
+!/storage/app/public/brands/
+/storage/app/public/brands/*
+!/storage/app/public/brands/.gitkeep
