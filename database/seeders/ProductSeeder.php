@@ -149,7 +149,7 @@ class ProductSeeder extends Seeder
 
                     // Product main image
                     $imageNumber = fake()->numberBetween(1, 4); // Assuming 4 image variations per product type
-                    $image = $typeConfig['image_prefix'] . '/product-' . $imageNumber . '.jpg';
+                    $image = $typeConfig['image_prefix'] . '/product-' . $imageNumber . '-alt' . '.jpg';
 
                     // Add to products array
                     $products[] = [

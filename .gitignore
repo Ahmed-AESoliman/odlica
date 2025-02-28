@@ -24,5 +24,4 @@ yarn-error.log
 
 /storage/app/public/*
 !/storage/app/public/brands/
-/storage/app/public/brands/*
-!/storage/app/public/brands/.gitkeep
+!/storage/app/public/clothing/
