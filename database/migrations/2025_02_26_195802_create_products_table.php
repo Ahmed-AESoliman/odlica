@@ -29,7 +29,7 @@ return new class extends Migration
             $table->decimal('average_rating', 3, 2)->nullable();
             $table->boolean('on_sale')->default(false);
             $table->decimal('discount_percentage', 5, 2)->nullable();
-            $table->timestamp('new_until')->nullable();
+            $table->date('new_until')->nullable();
             $table->timestamps();
 
             // Indexes for product filtering
