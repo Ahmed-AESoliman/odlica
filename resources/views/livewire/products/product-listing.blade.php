@@ -96,7 +96,7 @@
     </flux:sidebar>
 
 
-    <div class="grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 flex-1 overflow-y-auto">
+    <div class="grid md:grid-cols-3  xl:grid-cols-5 gap-2 flex-1 overflow-y-auto">
         @foreach ($products as $product)
             <x-product-card :product="$product" />
         @endforeach
@@ -105,4 +105,5 @@
             {{ $products->links() }}
         </div>
     </div>
+    <livewire:cart.cart-overview />
 </div>

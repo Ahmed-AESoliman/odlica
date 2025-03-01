@@ -26,8 +26,8 @@ class ProductListing extends Component
     ];
 
     // Sorting properties
-    public $sortField = 'name';
-    public $sortDirection = 'asc';
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
     public $perPage = 20;
 
     // Services
@@ -46,10 +46,11 @@ class ProductListing extends Component
             'on_sale' => false,
             'in_stock' => false,
         ]],
-        'sortField' => ['except' => 'name'],
-        'sortDirection' => ['except' => 'asc'],
+        'sortField' => ['except' => 'created_at'],
+        'sortDirection' => ['except' => 'desc'],
         'page' => ['except' => 1],
     ];
+
     // Reset pagination on filter/search changes
     public function updatedSearch()
     {
@@ -81,7 +82,6 @@ class ProductListing extends Component
 
     public function mount()
     {
-        // Initialize max price
         if ($this->filters['price_max'] === 1000) {
             $this->filters['price_max'] = $this->productService->getMaxPrice();
         }
@@ -136,14 +136,23 @@ class ProductListing extends Component
 
     public function addToCart($productId, $variantId = null, $quantity = 1)
     {
-        // Dispatch action to the cart store
-        $this->cartStore->dispatch(CartActions::ADD_TO_CART, [
-            'productId' => $productId,
-            'variantId' => $variantId,
-            'quantity' => $quantity
-        ]);
-
-        $this->dispatch('notify', 'Product added to cart!');
+        try {
+            $this->cartStore->dispatch(CartActions::ADD_TO_CART, [
+                'productId' => $productId,
+                'variantId' => $variantId,
+                'quantity' => $quantity
+            ]);
+            $this->dispatch('cart-updated');
+            $this->dispatch('notify', [
+                'message' => 'Item add to cart',
+                'type' => 'success'
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('notify', [
+                'message' => 'Failed to add item: ' . $e->getMessage(),
+                'type' => 'error'
+            ]);
+        }
     }
 
     public function render()

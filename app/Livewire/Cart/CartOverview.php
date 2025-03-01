@@ -10,24 +10,18 @@ use Livewire\Component;
 
 class CartOverview extends Component
 {
-    public $isOpen = false;
     public $cartItems = [];
     public $cartTotal = 0;
 
     // Actions
     protected $removeFromCartAction;
-    protected $updateCartQuantityAction;
-    protected $clearCartAction;
 
     // Store
     protected $cartStore;
 
     protected $listeners = [
-        'toggleCart' => 'toggle',
-        'cart-updated' => '$refresh',
+        'cart-updated' => 'refreshCart',
         'removeFromCart' => 'removeItem',
-        'updateCartQuantity' => 'updateQuantity',
-        'clearCart' => 'clearCart',
         'getCartData' => 'getCartData'
     ];
 
@@ -37,13 +31,9 @@ class CartOverview extends Component
     public function boot(
         CartStore $cartStore,
         RemoveFromCartAction $removeFromCartAction,
-        UpdateCartQuantityAction $updateCartQuantityAction,
-        ClearCartAction $clearCartAction
     ) {
         $this->cartStore = $cartStore;
         $this->removeFromCartAction = $removeFromCartAction;
-        $this->updateCartQuantityAction = $updateCartQuantityAction;
-        $this->clearCartAction = $clearCartAction;
     }
 
     /**
@@ -52,22 +42,6 @@ class CartOverview extends Component
     public function mount()
     {
         $this->updateCart();
-    }
-
-    /**
-     * Toggle the cart panel
-     */
-    public function toggle()
-    {
-        $this->isOpen = !$this->isOpen;
-    }
-
-    /**
-     * Close the cart panel
-     */
-    public function close()
-    {
-        $this->isOpen = false;
     }
 
     /**
@@ -80,6 +54,14 @@ class CartOverview extends Component
     }
 
     /**
+     * Refresh cart data when cart is updated
+     */
+    public function refreshCart()
+    {
+        $this->updateCart();
+    }
+
+    /**
      * Remove an item from the cart
      */
     public function removeItem($params)
@@ -89,52 +71,18 @@ class CartOverview extends Component
         if ($itemId) {
             try {
                 $this->removeFromCartAction->execute($itemId);
+                $this->updateCart();
                 $this->dispatch('cart-updated');
-                $this->dispatch('notify', 'Item removed from cart');
+                $this->dispatch('notify', [
+                    'message' => 'Item removed from cart',
+                    'type' => 'success'
+                ]);
             } catch (\Exception $e) {
                 $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Failed to remove item from cart'
+                    'message' => 'Failed to remove item: ' . $e->getMessage(),
+                    'type' => 'error'
                 ]);
             }
-        }
-    }
-
-    /**
-     * Update item quantity
-     */
-    public function updateQuantity($params)
-    {
-        $itemId = $params['itemId'] ?? null;
-        $quantity = $params['quantity'] ?? 1;
-
-        if ($itemId) {
-            try {
-                $this->updateCartQuantityAction->execute($itemId, $quantity);
-                $this->dispatch('cart-updated');
-            } catch (\Exception $e) {
-                $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Failed to update item quantity'
-                ]);
-            }
-        }
-    }
-
-    /**
-     * Clear the cart
-     */
-    public function clearCart()
-    {
-        try {
-            $this->clearCartAction->execute();
-            $this->dispatch('cart-updated');
-            $this->dispatch('notify', 'Cart cleared');
-        } catch (\Exception $e) {
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => 'Failed to clear cart'
-            ]);
         }
     }
 

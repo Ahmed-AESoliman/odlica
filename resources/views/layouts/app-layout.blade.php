@@ -19,8 +19,8 @@
 
 <body class="antialiased dark:bg-gray-800 text-gray-900 dark:text-white
 min-h-dvh">
+    <x-notification />
     <livewire:layout.header />
-    <livewire:layout.cart />
     <flux:main>
         {{ $slot }}
     </flux:main>
