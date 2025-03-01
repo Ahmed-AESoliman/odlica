@@ -21,7 +21,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-
-/storage/app/public/*
+/storage/*
 !/storage/app/public/brands/
 !/storage/app/public/clothing/

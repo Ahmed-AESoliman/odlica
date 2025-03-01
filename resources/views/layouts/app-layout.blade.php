@@ -21,8 +21,7 @@
 min-h-dvh">
     <livewire:layout.header />
     <livewire:layout.cart />
-    <flux:main class="flex max-h-screen  gap-2">
-        <livewire:layout.filter />
+    <flux:main>
         {{ $slot }}
     </flux:main>
 

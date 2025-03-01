@@ -1,9 +1,8 @@
-<!-- resources/views/components/auto-carousel.blade.php -->
 <div x-data="{
     activeSlide: 0,
     slides: [],
     interval: {{ $interval ?? 5000 }},
-    autoplayEnabled: {{ $autoplay ?? 'true' }},
+    autoplayEnabled: {{ $autoplay ?? 'false' }},
     timer: null,
 
     init() {
