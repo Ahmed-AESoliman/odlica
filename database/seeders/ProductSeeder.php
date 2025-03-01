@@ -77,8 +77,6 @@ class ProductSeeder extends Seeder
         $productSizeRelations = [];
         $productVariants = [];
         $productImages = [];
-        $variantColorRelations = []; // New array for variant_color relations
-        $variantSizeRelations = []; // New array for variant_size relations
 
         $categoryNameToId = [];
         foreach ($categories as $category) {
@@ -95,7 +93,6 @@ class ProductSeeder extends Seeder
             try {
                 $products = [];
                 $currentBatchSize = min($batchSize, $totalRecords - (($batch - 1) * $batchSize));
-                $variantId = 1; // Starting ID for variants (will be incremented)
 
                 for ($i = 0; $i < $currentBatchSize; $i++) {
                     // Generate a unique product ID for this batch
@@ -191,7 +188,6 @@ class ProductSeeder extends Seeder
                     }
 
                     // Assign sizes if applicable
-                    $selectedSizes = [];
                     if (!empty($typeConfig['size_type']) && isset($sizesByType[$typeConfig['size_type']])) {
                         $sizesForType = $sizesByType[$typeConfig['size_type']];
                         $sizeCount = fake()->numberBetween(1, min(4, count($sizesForType)));
@@ -214,96 +210,20 @@ class ProductSeeder extends Seeder
                             // Create color + size variants
                             foreach ($productColors as $colorId) {
                                 foreach ($selectedSizes as $size) {
-                                    // Create variant and get its index
-                                    $newVariantId = $this->addVariantWithId(
-                                        $productVariants,
-                                        $variantId,
-                                        $productId,
-                                        $sku,
-                                        $colorId,
-                                        $size->id,
-                                        $price,
-                                        $salePrice
-                                    );
-
-                                    // Add color relationship for this variant
-                                    $variantColorRelations[] = [
-                                        'product_variant_id' => $newVariantId,
-                                        'color_id' => $colorId,
-                                        'created_at' => now()->format('Y-m-d H:i:s'),
-                                        'updated_at' => now()->format('Y-m-d H:i:s'),
-                                    ];
-
-                                    // Add size relationship for this variant
-                                    $variantSizeRelations[] = [
-                                        'product_variant_id' => $newVariantId,
-                                        'size_id' => $size->id,
-                                        'created_at' => now()->format('Y-m-d H:i:s'),
-                                        'updated_at' => now()->format('Y-m-d H:i:s'),
-                                    ];
-
-                                    $variantId++;
+                                    $this->addVariant($productVariants, $productId, $sku, $colorId, $size->id, $price, $salePrice);
                                 }
                             }
                         } elseif (in_array('color', $typeConfig['variant_types']) && in_array('storage', $typeConfig['variant_types'])) {
                             // Create color + storage variants
                             foreach ($productColors as $colorId) {
                                 foreach ($selectedSizes as $size) {
-                                    // Create variant and get its index
-                                    $newVariantId = $this->addVariantWithId(
-                                        $productVariants,
-                                        $variantId,
-                                        $productId,
-                                        $sku,
-                                        $colorId,
-                                        $size->id,
-                                        $price,
-                                        $salePrice
-                                    );
-
-                                    // Add color relationship for this variant
-                                    $variantColorRelations[] = [
-                                        'product_variant_id' => $newVariantId,
-                                        'color_id' => $colorId,
-                                        'created_at' => now()->format('Y-m-d H:i:s'),
-                                        'updated_at' => now()->format('Y-m-d H:i:s'),
-                                    ];
-
-                                    // Add size relationship for this variant
-                                    $variantSizeRelations[] = [
-                                        'product_variant_id' => $newVariantId,
-                                        'size_id' => $size->id,
-                                        'created_at' => now()->format('Y-m-d H:i:s'),
-                                        'updated_at' => now()->format('Y-m-d H:i:s'),
-                                    ];
-
-                                    $variantId++;
+                                    $this->addVariant($productVariants, $productId, $sku, $colorId, $size->id, $price, $salePrice);
                                 }
                             }
                         } elseif (in_array('color', $typeConfig['variant_types'])) {
                             // Create color-only variants
                             foreach ($productColors as $colorId) {
-                                // Create variant and get its index
-                                $newVariantId = $this->addVariantWithId(
-                                    $productVariants,
-                                    $variantId,
-                                    $productId,
-                                    $sku,
-                                    $colorId,
-                                    null,
-                                    $price,
-                                    $salePrice
-                                );
-
-                                // Add color relationship for this variant
-                                $variantColorRelations[] = [
-                                    'product_variant_id' => $newVariantId,
-                                    'color_id' => $colorId,
-                                    'created_at' => now()->format('Y-m-d H:i:s'),
-                                    'updated_at' => now()->format('Y-m-d H:i:s'),
-                                ];
-
-                                $variantId++;
+                                $this->addVariant($productVariants, $productId, $sku, $colorId, null, $price, $salePrice);
                             }
                         }
                     }
@@ -349,22 +269,6 @@ class ProductSeeder extends Seeder
                         DB::table('product_variants')->insert($chunk);
                     }
                     $productVariants = []; // Free memory
-                }
-
-                // Insert variant-color relationships in chunks
-                if (!empty($variantColorRelations)) {
-                    foreach (array_chunk($variantColorRelations, 1000) as $chunk) {
-                        DB::table('variant_color')->insert($chunk);
-                    }
-                    $variantColorRelations = []; // Free memory
-                }
-
-                // Insert variant-size relationships in chunks
-                if (!empty($variantSizeRelations)) {
-                    foreach (array_chunk($variantSizeRelations, 1000) as $chunk) {
-                        DB::table('variant_size')->insert($chunk);
-                    }
-                    $variantSizeRelations = []; // Free memory
                 }
 
                 // Insert product images in chunks
@@ -479,44 +383,6 @@ class ProductSeeder extends Seeder
 
         $variants[] = $variant;
 
-        return count($variants) - 1; // Return the index of the added variant
-    }
-
-    /**
-     * Add a product variant to the variants array with a specific ID
-     *
-     * @return int The variant ID
-     */
-    protected function addVariantWithId(&$variants, $variantId, $productId, $baseSku, $colorId, $sizeId, $basePrice, $baseSalePrice)
-    {
-        $variantSku = $baseSku;
-
-        if ($colorId) {
-            $variantSku .= '-C' . $colorId;
-        }
-
-        if ($sizeId) {
-            $variantSku .= '-S' . $sizeId;
-        }
-
-        // Variants may have slight price variations
-        $priceMultiplier = fake()->randomElement([0.95, 1.0, 1.0, 1.0, 1.1, 1.2]);
-        $price = round($basePrice * $priceMultiplier, 2);
-        $salePrice = $baseSalePrice ? round($baseSalePrice * $priceMultiplier, 2) : null;
-
-        $variant = [
-            'id' => $variantId,
-            'product_id' => $productId,
-            'sku' => $variantSku,
-            'price' => $price,
-            'sale_price' => $salePrice,
-            'stock' => fake()->numberBetween(0, 100),
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
-        ];
-
-        $variants[] = $variant;
-
-        return $variantId; // Return the variant ID
+        return count($variants) - 1;
     }
 }

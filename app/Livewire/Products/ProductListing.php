@@ -12,7 +12,7 @@ use Livewire\WithPagination;
 class ProductListing extends Component
 {
     use WithPagination;
-
+    public $page = 1;
     public $search = '';
     public $filters = [
         'category' => null,
