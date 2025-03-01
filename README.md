@@ -57,6 +57,12 @@ Ensure you have the following installed:
     SESSION_DRIVER=redis
     ```
 
+    number of products need to be seeding
+
+    ```ini
+     SEED_PRODUCTS_COUNT=1000000
+    ```
+
 4. **Generate Application Key**
 
     ```sh
