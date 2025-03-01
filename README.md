@@ -22,7 +22,7 @@ Ensure you have the following installed:
 
     ```sh
     git clone https://github.com/Ahmed-AESoliman/odlica.git
-    cd ecommerce
+    cd odlica
     ```
 
 2. **Install Dependencies**
